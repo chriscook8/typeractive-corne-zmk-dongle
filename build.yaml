@@ -1,29 +1,20 @@
 # ZMK Build Configuration for Corne with Dongle Setup
-#
-# This configuration builds:
-# 1. Dongle firmware (central role) - connect to computer via USB
-# 2. Left half firmware (peripheral) - connects to dongle via BLE
-# 3. Right half firmware (peripheral) - connects to dongle via BLE
-# 4. Settings reset firmware - for clearing pairing info
 
 include:
   # Dongle - Central device (connects to computer via USB)
   - board: nice_nano_v2
     shield: corne_dongle
-    cmake-args: -DCONFIG_ZMK_SPLIT=y -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
     artifact-name: corne_dongle-nice_nano_v2
 
   # Left half - Peripheral (connects to dongle via BLE)
   - board: nice_nano_v2
     shield: corne_left
-    cmake-args: -DCONFIG_ZMK_SPLIT=y -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
-    artifact-name: corne_left-nice_nano_v2-peripheral
+    artifact-name: corne_left-nice_nano_v2
 
   # Right half - Peripheral (connects to dongle via BLE)
   - board: nice_nano_v2
     shield: corne_right
-    cmake-args: -DCONFIG_ZMK_SPLIT=y -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
-    artifact-name: corne_right-nice_nano_v2-peripheral
+    artifact-name: corne_right-nice_nano_v2
 
   # Settings reset firmware - flash this first on all devices to clear pairing
   - board: nice_nano_v2
