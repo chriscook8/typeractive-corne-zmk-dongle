@@ -1,4 +1,22 @@
-# Minimal test build
+# ZMK Build Configuration for Corne with Dongle Setup
+
 include:
+  # Dongle - Central device (connects to computer via USB)
+  - board: nice_nano
+    shield: corne_dongle
+    artifact-name: corne_dongle-nice_nano
+
+  # Left half - Peripheral (connects to dongle via BLE)
+  - board: nice_nano
+    shield: corne_left
+    artifact-name: corne_left-nice_nano
+
+  # Right half - Peripheral (connects to dongle via BLE)
+  - board: nice_nano
+    shield: corne_right
+    artifact-name: corne_right-nice_nano
+
+  # Settings reset firmware - flash this first on all devices to clear pairing
   - board: nice_nano
     shield: settings_reset
+    artifact-name: settings_reset-nice_nano
