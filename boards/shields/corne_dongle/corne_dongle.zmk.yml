@@ -1,0 +1,12 @@
+file_format: "1"
+id: corne_dongle
+name: Corne Dongle
+type: shield
+url: https://github.com/chriscook8/typeractive-corne-zmk-dongle
+requires:
+  - pro_micro
+features:
+  - keys
+siblings:
+  - corne_left
+  - corne_right
