@@ -1,5 +1,0 @@
-name: zmk-keyboard-corne-dongle
-build:
-  cmake: .
-  settings:
-    board_root: .
