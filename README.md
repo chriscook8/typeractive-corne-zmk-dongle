@@ -1,112 +1,193 @@
-# Corne Wireless with Dongle - ZMK Configuration
+# Typeractive Corne Wireless - Dongle Configuration
 
-This configuration sets up a Typeractive Corne wireless split keyboard with a Nice Nano dongle acting as the central device.
+ZMK firmware configuration for a Typeractive Corne 6-column wireless split keyboard using a Nice Nano as a USB dongle.
 
 ## Architecture
 
 ```
-┌─────────────┐     BLE      ┌─────────────┐     BLE      ┌─────────────┐
-│  Left Half  │ ───────────► │   Dongle    │ ◄─────────── │ Right Half  │
-│ (Peripheral)│              │  (Central)  │              │ (Peripheral)│
-└─────────────┘              └──────┬──────┘              └─────────────┘
-                                    │ USB
-                                    ▼
-                              ┌──────────┐
-                              │ Computer │
-                              └──────────┘
+┌─────────────────┐     BLE      ┌─────────────┐     BLE      ┌──────────────────┐
+│  Left Keyboard  │ ───────────► │   Dongle    │ ◄─────────── │  Right Keyboard  │
+│  (Peripheral)   │              │  (Central)  │              │   (Peripheral)   │
+└─────────────────┘              └──────┬──────┘              └──────────────────┘
+                                        │ USB
+                                        ▼
+                                  ┌──────────┐
+                                  │ Computer │
+                                  └──────────┘
 ```
 
-- **Dongle**: Nice Nano connected to computer via USB, acts as BLE central
-- **Left/Right Halves**: Nice Nano boards on keyboard, act as BLE peripherals
+- **Dongle**: Nice Nano v2 connected to computer via USB, acts as BLE central
+- **Left/Right Halves**: Nice Nano v2 boards on keyboard halves, act as BLE peripherals
 
-## Files Generated
+## Features
+
+- Wireless dongle setup with both keyboard halves as peripherals
+- ZMK Studio support for real-time keymap editing
+- 5 Bluetooth profiles for connecting to multiple devices
+- Deep sleep support on keyboard halves for battery savings
+
+## Repository Structure
 
 ```
-corne/
-├── .github/workflows/build.yml    # GitHub Actions build workflow
-├── boards/shields/corne_dongle/   # Dongle shield definition
-│   ├── Kconfig.defconfig
-│   ├── Kconfig.shield
-│   ├── corne_dongle.conf
-│   └── corne_dongle.overlay
+├── .github/workflows/build.yml     # GitHub Actions build workflow
+├── boards/shields/corne_dongle_setup/
+│   ├── Kconfig.defconfig           # Shield configuration defaults
+│   ├── Kconfig.shield              # Shield definitions
+│   ├── corne.dtsi                  # Shared devicetree configuration
+│   ├── corne.keymap                # Keymap (edit this for layout changes)
+│   ├── corne_dongle.overlay        # Dongle devicetree overlay
+│   ├── corne_peripheral_left.overlay   # Left half overlay
+│   └── corne_peripheral_right.overlay  # Right half overlay
 ├── config/
-│   ├── corne.conf                 # Shared configuration
-│   ├── corne.keymap              # Your keymap (customize this!)
-│   ├── corne_left.conf           # Left peripheral config
-│   ├── corne_right.conf          # Right peripheral config
-│   └── west.yml                  # West manifest
-├── build.yaml                    # Build matrix
-└── README.md
+│   ├── corne_dongle.conf           # Dongle-specific settings
+│   ├── corne_peripheral_left.conf  # Left half settings
+│   ├── corne_peripheral_right.conf # Right half settings
+│   └── west.yml                    # West manifest
+├── zephyr/module.yml               # ZMK module configuration
+└── build.yaml                      # Build matrix configuration
 ```
 
-## Setup Instructions
+## Firmware Files
 
-### 1. Create GitHub Repository
+After building, download from GitHub Actions artifacts:
 
-1. Create a new repository on GitHub
-2. Push this configuration to the repository
-3. GitHub Actions will automatically build the firmware
+| File | Device | Description |
+|------|--------|-------------|
+| `corne_dongle-nice_nano.uf2` | Dongle | Central device firmware |
+| `corne_left-nice_nano.uf2` | Left keyboard | Left peripheral firmware |
+| `corne_right-nice_nano.uf2` | Right keyboard | Right peripheral firmware |
+| `settings_reset-nice_nano.uf2` | All devices | Clears pairing data |
 
-### 2. Flash Settings Reset (CRITICAL - Do This First!)
+## Initial Setup
 
-Before flashing the new firmware, you MUST clear existing pairing data on ALL THREE devices:
+### 1. Flash Settings Reset (All Devices)
 
-1. Download `settings_reset-nice_nano_v2.uf2` from the build artifacts
-2. For each device (dongle, left half, right half):
-   - Double-tap the reset button to enter bootloader mode
-   - Copy `settings_reset-nice_nano_v2.uf2` to the NICENANO drive
-   - Wait for the device to reboot
+Clear existing pairing data on all three devices:
 
-### 3. Flash Dongle Firmware
+1. Double-tap reset button to enter bootloader
+2. Copy `settings_reset-nice_nano.uf2` to the NICENANO drive
+3. Repeat for dongle, left half, and right half
 
-1. Download `corne_dongle-nice_nano_v2.uf2`
-2. Double-tap reset on the dongle Nice Nano
-3. Copy the `.uf2` file to the NICENANO drive
+### 2. Flash Dongle
 
-### 4. Flash Peripheral Firmware
+1. Double-tap reset on the dongle Nice Nano
+2. Copy `corne_dongle-nice_nano.uf2` to the drive
+3. Connect dongle to computer via USB
 
-1. Download `corne_left-nice_nano_v2-peripheral.uf2`
-2. Double-tap reset on the left keyboard half
-3. Copy the `.uf2` file to the NICENANO drive
+### 3. Flash Keyboard Halves
 
-Repeat for the right half with `corne_right-nice_nano_v2-peripheral.uf2`
+**Left half:**
+1. Double-tap reset
+2. Copy `corne_left-nice_nano.uf2` to the drive
 
-### 5. Pairing
+**Right half:**
+1. Double-tap reset
+2. Copy `corne_right-nice_nano.uf2` to the drive
 
-After flashing:
-1. Connect the dongle to your computer via USB
+### 4. Pairing
+
+After flashing all devices:
+1. Ensure dongle is connected to computer via USB
 2. Power on both keyboard halves
 3. They should automatically pair with the dongle
 
-If pairing fails, repeat step 2 (settings reset) on all devices.
+## Default Keymap
+
+### Base Layer
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│ TAB │  Q  │  W  │  E  │  R  │  T  │   │  Y  │  U  │  I  │  O  │  P  │BKSP │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│CTRL │  A  │  S  │  D  │  F  │  G  │   │  H  │  J  │  K  │  L  │  ;  │  '  │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│SHIFT│  Z  │  X  │  C  │  V  │  B  │   │  N  │  M  │  ,  │  .  │  /  │ ESC │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │LWR  │ SPC │   │ ENT │RSE  │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+```
+
+### Lower Layer (Hold LWR)
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│ TAB │  1  │  2  │  3  │  4  │  5  │   │  6  │  7  │  8  │  9  │  0  │BKSP │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│BTCLR│ BT1 │ BT2 │ BT3 │ BT4 │ BT5 │   │  ←  │  ↓  │  ↑  │  →  │     │     │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│SHIFT│UNLCK│     │     │     │     │   │     │     │     │     │     │     │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │     │ SPC │   │ ENT │     │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+```
+
+### Raise Layer (Hold RSE)
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│ TAB │  !  │  @  │  #  │  $  │  %  │   │  ^  │  &  │  *  │  (  │  )  │BKSP │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│CTRL │     │     │     │     │     │   │  -  │  =  │  [  │  ]  │  \  │  `  │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│SHIFT│     │     │     │     │     │   │  _  │  +  │  {  │  }  │  |  │  ~  │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │     │ SPC │   │ ENT │     │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+```
+
+## ZMK Studio
+
+This configuration includes ZMK Studio support for real-time keymap editing.
+
+1. Connect the dongle to your computer
+2. Open [ZMK Studio](https://zmk.studio)
+3. Press **Lower + Z** to unlock the keyboard for editing
+4. Make changes to your keymap in the web interface
+
+## Bluetooth Profiles
+
+The dongle supports 5 Bluetooth profiles. Use the Lower layer to manage them:
+
+- **BT1-BT5**: Select Bluetooth profile
+- **BTCLR**: Clear current profile's pairing
 
 ## Customization
 
-### Keymap
+### Editing the Keymap
 
-Edit `config/corne.keymap` to customize your layout. The default includes:
-- Layer 0: QWERTY base
-- Layer 1: Numbers and navigation
-- Layer 2: Symbols
+Edit `boards/shields/corne_dongle_setup/corne.keymap` to customize your layout.
 
-### Bluetooth Profiles
+### Configuration Options
 
-The dongle supports 5 BT profiles (in addition to USB). Use `BT_SEL 0-4` to switch profiles and `BT_CLR` to clear the current profile.
+Edit the `.conf` files in `config/` to enable features:
 
-### Display Support
+- `corne_dongle.conf` - Dongle settings
+- `corne_peripheral_left.conf` - Left half settings
+- `corne_peripheral_right.conf` - Right half settings
 
-Uncomment the display options in `config/corne.conf` if using OLED or nice!view displays.
+## Troubleshooting
 
-## Local Building (Optional)
+**Keyboard halves not connecting:**
+- Flash `settings_reset` on all three devices
+- Ensure dongle is powered via USB before powering keyboard halves
+- Verify correct firmware on each device
 
-If you prefer to build locally instead of using GitHub Actions:
+**Only one half works:**
+- Verify both halves have peripheral firmware (not dongle firmware)
+- Check that `ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS=2` in dongle config
+
+**Keys not responding:**
+- Confirm the dongle is recognized as a USB HID device
+- Check that the keyboard halves are paired (may take a few seconds)
+
+**ZMK Studio not connecting:**
+- Ensure you're using the dongle firmware with Studio support
+- Press Lower + Z to unlock the keyboard
+
+## Building Locally
 
 ```bash
 # Install west
 pip install west
 
 # Initialize workspace
-cd corne
 west init -l config
 west update
 
@@ -114,35 +195,23 @@ west update
 west build -s zmk/app -b nice_nano_v2 -- \
   -DSHIELD=corne_dongle \
   -DZMK_CONFIG="$(pwd)/config" \
-  -DZMK_EXTRA_MODULES="$(pwd)/boards" \
-  -DCONFIG_ZMK_SPLIT=y \
-  -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
+  -DZMK_EXTRA_MODULES="$(pwd)"
 
 # Build left peripheral
 west build -s zmk/app -b nice_nano_v2 --pristine -- \
-  -DSHIELD=corne_left \
+  -DSHIELD=corne_peripheral_left \
   -DZMK_CONFIG="$(pwd)/config" \
-  -DCONFIG_ZMK_SPLIT=y \
-  -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
+  -DZMK_EXTRA_MODULES="$(pwd)"
 
 # Build right peripheral
 west build -s zmk/app -b nice_nano_v2 --pristine -- \
-  -DSHIELD=corne_right \
+  -DSHIELD=corne_peripheral_right \
   -DZMK_CONFIG="$(pwd)/config" \
-  -DCONFIG_ZMK_SPLIT=y \
-  -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n
+  -DZMK_EXTRA_MODULES="$(pwd)"
 ```
 
-## Troubleshooting
+## Credits
 
-**Keyboard halves not connecting to dongle:**
-- Flash settings reset on all three devices
-- Ensure dongle is powered via USB before powering keyboard halves
-- Check that all devices are running the correct firmware (dongle vs peripheral)
-
-**Latency issues:**
-- Uncomment `CONFIG_BT_CTLR_TX_PWR_PLUS_8=y` in `corne_dongle.conf` for increased range
-
-**Only one half works:**
-- Verify both halves are flashed with peripheral firmware (not central)
-- Check `ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS=2` in dongle config
+- [ZMK Firmware](https://zmk.dev)
+- [Typeractive](https://typeractive.xyz)
+- Based on the [Corne keyboard](https://github.com/foostan/crkbd) by foostan
