@@ -111,7 +111,7 @@ After flashing all devices:
 ┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
 │ TAB │  1  │  2  │  3  │  4  │  5  │   │  6  │  7  │  8  │  9  │  0  │BKSP │
 ├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
-│BTCLR│ BT1 │ BT2 │ BT3 │ BT4 │ BT5 │   │  ←  │  ↓  │  ↑  │  →  │     │     │
+│BTCLR│ BT1 │ BT2 │ BT3 │ BT4 │ BT5 │   │  ←  │  ↓  │  ↑  │  →  │     │ OUT │
 ├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
 │SHIFT│UNLCK│     │     │     │     │   │     │     │     │     │     │     │
 └─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
@@ -147,6 +147,13 @@ The dongle supports 5 Bluetooth profiles. Use the Lower layer to manage them:
 
 - **BT1-BT5**: Select Bluetooth profile
 - **BTCLR**: Clear current profile's pairing
+
+## Output Switching
+
+The dongle can output to either USB or Bluetooth, allowing you to connect to a phone or tablet via Bluetooth even while USB is plugged in:
+
+- **OUT** (Lower + '): Toggle between USB and Bluetooth output
+- When set to Bluetooth, the dongle uses the currently selected BT profile
 
 ## Customization
 
