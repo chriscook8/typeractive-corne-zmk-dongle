@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Pete Johanson
+# Copyright (c) 2024
 # SPDX-License-Identifier: MIT
 
 # Dongle is the central
@@ -30,8 +30,8 @@ config ZMK_BLE
 
 endif
 
-# Left half is a peripheral (NOT central)
-if SHIELD_CORNE_LEFT
+# Left peripheral
+if SHIELD_CORNE_PERIPHERAL_LEFT
 
 config ZMK_SPLIT
     default y
@@ -44,8 +44,8 @@ config ZMK_BLE
 
 endif
 
-# Right half is a peripheral
-if SHIELD_CORNE_RIGHT
+# Right peripheral
+if SHIELD_CORNE_PERIPHERAL_RIGHT
 
 config ZMK_SPLIT
     default y
