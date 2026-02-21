@@ -88,13 +88,13 @@
         };
 
         // Layer 1 – Lower (numbers, BT, arrows)
-        // Lower + B  →  toggle Taipo mode on/off
+        // Lower + TAB  →  toggle Taipo mode on/off
         lower_layer {
             display-name = "Lower";
             bindings = <
-                &kp TAB    &kp N1         &kp N2       &kp N3       &kp N4       &kp N5         &kp N6   &kp N7   &kp N8 &kp N9    &kp N0 &kp BSPC
+                &tog 3     &kp N1         &kp N2       &kp N3       &kp N4       &kp N5         &kp N6   &kp N7   &kp N8 &kp N9    &kp N0 &kp BSPC
                 &bt BT_CLR &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans &out OUT_TOG
-                &kp LSHFT  &studio_unlock &trans       &trans       &trans       &tog 3          &trans   &trans   &trans &trans    &trans &trans
+                &kp LSHFT  &studio_unlock &trans       &trans       &trans       &trans          &trans   &trans   &trans &trans    &trans &trans
                                                        &kp LGUI     &trans       &kp SPACE      &kp RET  &trans   &kp RALT
             >;
         };
@@ -112,18 +112,17 @@
 
         // Layer 3 – Taipo
         // All output comes from combos defined in taipo.dtsi.
-        // The 8 Taipo keys per hand (&none) sit on the middle and bottom rows —
-        //   they don't emit anything alone, only combos fire.
-        // Top row and outer columns (&trans) pass through to Base so Tab etc. still work.
-        // TAB key (pos 0) exits Taipo via &tog 3 — easy escape hatch.
-        // Thumbs 2+3 per side (&none) are used exclusively by Taipo combos.
+        // Every key is &none — no base layer bleed-through.
+        // TAB (pos 0) and BSPC (pos 11) return to Base via &to 0.
+        // The 8 active Taipo keys per hand sit on the middle and bottom rows.
+        // Thumbs 2+3 per side are used exclusively by Taipo combos.
         taipo_layer {
             display-name = "Taipo";
             bindings = <
-                &tog 3 &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &tog 3
-                &trans &none  &none  &none  &none  &trans   &trans &none  &none  &none  &none  &trans
-                &trans &none  &none  &none  &none  &trans   &trans &none  &none  &none  &none  &trans
-                              &trans &none  &none           &none  &none  &trans
+                &to 0 &none &none &none &none &none   &none &none &none &none &none &to 0
+                &none &none &none &none &none &none   &none &none &none &none &none &none
+                &none &none &none &none &none &none   &none &none &none &none &none &none
+                            &none &none &none          &none &none &none
             >;
         };
     };
