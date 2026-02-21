@@ -9,10 +9,74 @@
 #include <dt-bindings/zmk/outputs.h>
 #include <behaviors/studio_unlock.dtsi>
 
+// ── Taipo combo configuration ─────────────────────────────────────────────
+// Combos only fire on layer 3 (taipo_layer). Timeout tunable here.
+#define COMBO_TIMEOUT  70
+#define COMBO_LAYERS   3
+#define STICKY_TIMEOUT 500
+
+// Corne key positions (0-indexed, left→right across both halves):
+//
+//  Row 0 (top):   0   1   2   3   4   5  │  6   7   8   9  10  11
+//  Row 1 (mid):  12  13  14  15  16  17  │ 18  19  20  21  22  23
+//  Row 2 (bot):  24  25  26  27  28  29  │ 30  31  32  33  34  35
+//  Thumbs:       36  37  38             │     39  40  41
+//
+// Default layer mapping for reference:
+//  TAB  Q    W    E    R    T   │  Y    U    I    O    P    BSPC
+//  CTRL A    S    D    F    G   │  H    J    K    L    ;    '
+//  SHFT Z    X    C    V    B   │  N    M    ,    .    /    ESC
+//            GUI  LWR  SPC      │  ENT  RSE  RALT
+
+// ── Taipo finger→position mapping ─────────────────────────────────────────
+// Uses the middle 4 keys of the middle row + middle 4 keys of the bottom row.
+// (Skips the outer pinky column and the inner index-stretch column on each side.)
+//
+// Middle row left  (A S D F = pinky ring middle index):
+#define TLP 13    // A  – left pinky,  middle row
+#define TLR 14    // S  – left ring,   middle row
+#define TLM 15    // D  – left middle, middle row
+#define TLI 16    // F  – left index,  middle row
+// Bottom row left  (Z X C V):
+#define BLP 25    // Z  – left pinky,  bottom row
+#define BLR 26    // X  – left ring,   bottom row
+#define BLM 27    // C  – left middle, bottom row
+#define BLI 28    // V  – left index,  bottom row
+// Left thumbs (LWR = inner, SPC = outer — mirrors taipo cradio convention):
+#define LIT 37    // LWR thumb → Backspace in Taipo
+#define LOT 38    // SPC thumb → Space    in Taipo
+
+// Middle row right  (J K L ; = index middle ring pinky):
+#define TRI 19    // J  – right index,  middle row
+#define TRM 20    // K  – right middle, middle row
+#define TRR 21    // L  – right ring,   middle row
+#define TRP 22    // ;  – right pinky,  middle row
+// Bottom row right  (M , . /):
+#define BRI 31    // M  – right index,  bottom row
+#define BRM 32    // ,  – right middle, bottom row
+#define BRR 33    // .  – right ring,   bottom row
+#define BRP 34    // /  – right pinky,  bottom row
+// Right thumbs:
+#define RIT 39    // ENT thumb → Backspace in Taipo
+#define ROT 40    // RSE thumb → Space    in Taipo
+
+// ── Sticky key behaviour (used by Taipo shift/ctrl/alt/gui) ───────────────
+&sk {
+    release-after-ms = <STICKY_TIMEOUT>;
+    quick-release;
+};
+
 / {
+    // ── Taipo combos (active only on layer 3) ─────────────────────────────
+    combos {
+        compatible = "zmk,combos";
+        #include "taipo.dtsi"
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
+        // Layer 0 – Base (unchanged)
         default_layer {
             display-name = "Base";
             bindings = <
@@ -23,16 +87,19 @@
             >;
         };
 
+        // Layer 1 – Lower (numbers, BT, arrows)
+        // Lower + B  →  toggle Taipo mode on/off
         lower_layer {
             display-name = "Lower";
             bindings = <
-                &kp TAB    &kp N1       &kp N2       &kp N3       &kp N4       &kp N5         &kp N6   &kp N7   &kp N8 &kp N9    &kp N0 &kp BSPC
-                &bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans &out OUT_TOG
-                &kp LSHFT  &studio_unlock &trans     &trans       &trans       &trans         &trans   &trans   &trans &trans    &trans &trans
-                                                     &kp LGUI     &trans       &kp SPACE      &kp RET  &trans   &kp RALT
+                &kp TAB    &kp N1         &kp N2       &kp N3       &kp N4       &kp N5         &kp N6   &kp N7   &kp N8 &kp N9    &kp N0 &kp BSPC
+                &bt BT_CLR &bt BT_SEL 0   &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   &kp LEFT &kp DOWN &kp UP &kp RIGHT &trans &out OUT_TOG
+                &kp LSHFT  &studio_unlock &trans       &trans       &trans       &tog 3          &trans   &trans   &trans &trans    &trans &trans
+                                                       &kp LGUI     &trans       &kp SPACE      &kp RET  &trans   &kp RALT
             >;
         };
 
+        // Layer 2 – Raise (symbols)
         raise_layer {
             display-name = "Raise";
             bindings = <
@@ -40,6 +107,23 @@
                 &kp LCTRL &trans   &trans &trans   &trans   &trans      &kp MINUS &kp EQUAL &kp LBKT  &kp RBKT &kp BSLH &kp GRAVE
                 &kp LSHFT &trans   &trans &trans   &trans   &trans      &kp UNDER &kp PLUS  &kp LBRC  &kp RBRC &kp PIPE &kp TILDE
                                           &kp LGUI &trans   &kp SPACE   &kp RET   &trans    &kp RALT
+            >;
+        };
+
+        // Layer 3 – Taipo
+        // All output comes from combos defined in taipo.dtsi.
+        // The 8 Taipo keys per hand (&none) sit on the middle and bottom rows —
+        //   they don't emit anything alone, only combos fire.
+        // Top row and outer columns (&trans) pass through to Base so Tab etc. still work.
+        // TAB key (pos 0) exits Taipo via &tog 3 — easy escape hatch.
+        // Thumbs 2+3 per side (&none) are used exclusively by Taipo combos.
+        taipo_layer {
+            display-name = "Taipo";
+            bindings = <
+                &tog 3 &trans &trans &trans &trans &trans   &trans &trans &trans &trans &trans &tog 3
+                &trans &none  &none  &none  &none  &trans   &trans &none  &none  &none  &none  &trans
+                &trans &none  &none  &none  &none  &trans   &trans &none  &none  &none  &none  &trans
+                              &trans &none  &none           &none  &none  &trans
             >;
         };
     };
